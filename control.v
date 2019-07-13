@@ -324,10 +324,10 @@ module control(clk,resetn,
     begin: state_table 
             case (current_state)
 				SETMAP: next_state = finish ? T1_WAIT : SETMAP;
-				T1_WAIT: next_state = ((tdirection==3'b000) | (t1moving==1'b1)) ? T2_WAIT : T1_CHECK;
-				T2_WAIT: next_state = ((tdirection==3'b000) | (t2moving==1'b1)) ? T3_WAIT : T2_CHECK;
-				T3_WAIT: next_state = ((tdirection==3'b000) | (t3moving==1'b1)) ? T4_WAIT : T3_CHECK;
-				T4_WAIT: next_state = ((tdirection==3'b000) | (t4moving==1'b1)) ? T1_WAIT : T4_CHECK;
+				T1_WAIT: next_state = ((tdirection1[2]==1'b0) | (t1moving==1'b1)) ? T2_WAIT : T1_CHECK;
+				T2_WAIT: next_state = ((tdirection2[2]==1'b0) | (t2moving==1'b1)) ? T3_WAIT : T2_CHECK;
+				T3_WAIT: next_state = ((tdirection3[2]==1'b0) | (t3moving==1'b1)) ? T4_WAIT : T3_CHECK;
+				T4_WAIT: next_state = ((tdirection4[2]==1'b0) | (t4moving==1'b1)) ? T1_WAIT : T4_CHECK;
 				T1_CHECK: next_state = T2_WAIT;
 				T2_CHECK: next_state = T3_WAIT;
 				T3_CHECK: next_state = T4_WAIT;
