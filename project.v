@@ -3,7 +3,6 @@ module project
 		CLOCK_50,						//	On Board 50 MHz
 		// Your inputs and outputs here
         KEY,
-        SW,
 		// The ports below are for the VGA output.  Do not change.
 		VGA_CLK,   						//	VGA Clock
 		VGA_HS,							//	VGA H_SYNC
@@ -12,11 +11,12 @@ module project
 		VGA_SYNC_N,						//	VGA SYNC
 		VGA_R,   						//	VGA Red[9:0]
 		VGA_G,	 						//	VGA Green[9:0]
-		VGA_B   						//	VGA Blue[9:0]
+		VGA_B,   						//	VGA Blue[9:0]
+		PS2_KBCLK,
+		PS2_KBDAT
 	);
 	input [3:0] KEY;
-	input [13:0] SW;
-	input CLOCK_50;
+	input CLOCK_50,PS2_KBCLK,PS2_KBDAT;
 	output			VGA_CLK;   				//	VGA Clock
 	output			VGA_HS;					//	VGA H_SYNC
 	output			VGA_VS;					//	VGA V_SYNC
@@ -35,17 +35,25 @@ module project
 	wire [7:0] x;
 	wire [6:0] y;
 	wire [2:0] colour;
+	wire [19:0] keyboard_output;
 	wire plot;
 	wire t1moving,t2moving,t3moving,t4moving;
 	wire b1ready,b2ready,b3ready,b4ready;
 	//wire t1e,t2e,t3e,t4e,b1e,b2e,b3e,b4e;
 	
 	assign resetn = KEY[0];
-
-	get_direction(SW[0],SW[1],SW[2],SW[3],tdirection1);
-	get_direction(SW[4],SW[5],SW[6],SW[7],tdirection2);
-	get_direction(SW[8],SW[9],SW[10],SW[11],tdirection3);
-	get_direction(SW[12],SW[13],~KEY[1],~KEY[2],tdirection4);
+	
+	Keyboard_PS2(
+	.clk_in(CLOCK_50),				//系统时钟
+	.rst_n_in(resetn),			//系统复位，低有效
+	.key_clk(PS2_KBCLK),			//PS2键盘时钟输入
+	.key_data(PS2_KBDAT),			//PS2键盘数据输入
+	.out(keyboard_output));
+	
+	get_direction(keyboard_output[0],keyboard_output[1],keyboard_output[2],keyboard_output[3],tdirection1);
+	get_direction(keyboard_output[4],keyboard_output[5],keyboard_output[6],keyboard_output[7],tdirection2);
+	get_direction(keyboard_output[8],keyboard_output[9],keyboard_output[10],keyboard_output[11],tdirection3);
+	get_direction(keyboard_output[12],keyboard_output[13],keyboard_output[14],keyboard_output[15],tdirection4);
 	//assign tdirection1 = 3'b101;
 	//assign tdirection2 = 3'b101;
 	//assign tdirection3 = 3'b100;
