@@ -12,7 +12,7 @@ module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
 	
 	map(counter_output2,map_out,mapselect);
 	
-	assign mx = 4'd9*xpos + 5'd21 + xp;
+	assign mx = 4'd9*xpos + 5'd21 + xp; // change the small coordinate (regarding blocks) to the big coordinate (regarding pixels)
 	assign my = 4'd9*ypos + 1'b1 + yp;
 	
 	always @(*)
@@ -23,19 +23,19 @@ module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
 				ypos = 4'b0110;
 				end
 			1'b1: begin
-				xpos = counter_output2[7:4];
+				xpos = counter_output2[7:4]; // the coordinate of walls (regarding blocks, not pixels)
 				ypos = counter_output2[3:0];
 				end
 		endcase
 	end
 	
 	always @(posedge clk)
-	begin: counter1
+	begin: counter1 // this is the counter for bricks of a wall
 		if(!resetn)
 			counter_output1 <= 6'd0;
-		else if(counter_output1 == 6'd47)
+		else if(counter_output1 == 6'd47) // reset counter if a wall is drawn. Each wall block contains 48 pixels
 			counter_output1 <= 6'd0;
-		else if(map_counter_enable == 1'b0)
+		else if(map_counter_enable == 1'b0) // start to count
 			counter_output1 <= 6'd0;
 		else
 			counter_output1 <= counter_output1 + 1'b1;
@@ -45,11 +45,11 @@ module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
 	begin: counter2
 		if(!resetn)
 			counter_output2 <= 8'd0;
-		else if(counter_output2 == 8'b11111111)
+		else if(counter_output2 == 8'b11111111) // reset counter
 			counter_output2 <= 8'd0;
-		else if(map_counter_enable == 1'b0)
+		else if(map_counter_enable == 1'b0) // start to count
 			counter_output2 <= 8'd0;
-		else if(counter_output1 == 6'd47)
+		else if(counter_output1 == 6'd47) // one more block is drawn, so add one.
 			counter_output2 <= counter_output2 + 1'b1;
 		else
 			counter_output2 <= counter_output2;
@@ -58,7 +58,7 @@ module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
 	assign map_finish = &counter_output2;
 	
 	always @(*)
-	begin
+	begin // hard code the bricks of each wall. 
 		case(counter_output1)
 			6'd0: begin
 				xp = 4'd0;
