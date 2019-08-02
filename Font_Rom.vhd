@@ -7,6 +7,7 @@
 -- I got this copy from FP-V-GA-Text: https://github.com/MadLittleMods/FP-V-GA-Text
 -- and I remove some functionalities to keep it as simply as possiable
 -- Original Source: https://github.com/thelonious/vga_generator/tree/master/vga_text
+-- Pixel_On_Text and Pixel_On_Text2 is also quoted from that source.
 
 -- VHDL'93 supports the full table of ISO-8859-1 characters (0x00 through 0xFF(255))
 -- ISO-8859-1 Table: http://kireji.com/reference/iso88591.html
