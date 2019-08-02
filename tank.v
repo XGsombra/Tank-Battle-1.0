@@ -36,35 +36,35 @@ module tank(clk,resetn,initial_xpos,initial_ypos,direction,xpos,ypos,moving,star
 		
 	always @(posedge clk)
 		begin
-			if(!resetn)begin
+			if(!resetn)begin // if reset, then move tanks back to their inital postions.
 				xpos <= initial_xpos;
 				ypos <= initial_ypos;
 				end
-			else if(init == 1'd1)begin
+			else if(init == 1'd1)begin // if in the initial state, tanks are in inital positions.
 				xpos <= initial_xpos;
 				ypos <= initial_ypos;
 				end
 			else if(divider == 1'd1)begin
 				case(moving_direction)
-					3'b100: begin
+					3'b100: begin // go up, so y--
 						xpos <= xpos;
 						ypos <= ypos-1'd1;
 						end
-					3'b101: begin
+					3'b101: begin // go up, so y++
 						xpos <= xpos;
 						ypos <= ypos+1'd1;
 						end
-					3'b110: begin
+					3'b110: begin // go up, so x--
 						xpos <= xpos-1'd1;
 						ypos <= ypos;
 						end
-					3'b111: begin
+					3'b111: begin // go up, so x++
 						xpos <= xpos+1'd1;
 						ypos <= ypos;
 						end
 				endcase
 			end
-			else begin
+			else begin // stay in the original place.
 				xpos <= xpos;
 				ypos <= ypos;
 				end
@@ -84,7 +84,7 @@ module tank(clk,resetn,initial_xpos,initial_ypos,direction,xpos,ypos,moving,star
 				counter_output <= counter_output;
 		end
 
-	assign finish = (counter_output == 4'd9) ? 1'b1 : 1'b0;
+	assign finish = (counter_output == 4'd9) ? 1'b1 : 1'b0; // a tank finishes moving when it had moved 9 pixels.
 
 	localparam      
 					WAIT    = 3'd0,
@@ -102,7 +102,7 @@ module tank(clk,resetn,initial_xpos,initial_ypos,direction,xpos,ypos,moving,star
 					WAIT: next_state = start ? INITIAL : WAIT;
 					INITIAL: next_state = STATIC;
 					STATIC: begin
-								if(direction[2] == 1'd0)
+						if(direction[2] == 1'd0) // this part is almost the same as the bullet.v module
 									next_state = STATIC;
 								else begin
 									case(direction[1:0])
