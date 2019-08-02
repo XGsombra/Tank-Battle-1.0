@@ -1,65 +1,31 @@
-module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
-	input resetn,clk,map_counter_enable;
-	input [1:0] mapselect;
-	output [7:0] mx;
-	output [6:0] my;
-	output map_finish;
+module erase_wall(clk,resetn,erase_wall_enable,x_y,x,y,finish);
+	input clk,resetn;
+	input erase_wall_enable;
+	input [7:0] x_y;
+	output [7:0] x;
+	output [6:0] y;
+	output finish;
+	reg [5:0] counter_output;
 	reg [3:0] xp,yp;
-	reg [5:0] counter_output1;
-	reg [7:0] counter_output2;
-	reg [3:0] xpos,ypos;
-	wire map_out;
 	
-	map(counter_output2,map_out,mapselect);
-	
-	assign mx = 4'd9*xpos + 5'd21 + xp;
-	assign my = 4'd9*ypos + 1'b1 + yp;
+	assign x = 4'd9*x_y[7:4] + 5'd21 + xp;
+	assign y = 4'd9*x_y[3:0] + 1'b1 + yp;
+	assign finish = (counter_output == 6'd47);
+	always @(posedge clk)
+	begin
+		if(!resetn)
+			counter_output <= 6'd0;
+		else if(counter_output == 6'd47)
+			counter_output <= 6'd0;
+		else if(!erase_wall_enable)
+			counter_output <= 6'd0;
+		else
+			counter_output <= counter_output + 1'b1;
+	end
 	
 	always @(*)
 	begin
-		case(map_out)
-			1'b0: begin
-				xpos = 4'b0110;
-				ypos = 4'b0110;
-				end
-			1'b1: begin
-				xpos = counter_output2[7:4];
-				ypos = counter_output2[3:0];
-				end
-		endcase
-	end
-	
-	always @(posedge clk)
-	begin: counter1
-		if(!resetn)
-			counter_output1 <= 6'd0;
-		else if(counter_output1 == 6'd47)
-			counter_output1 <= 6'd0;
-		else if(map_counter_enable == 1'b0)
-			counter_output1 <= 6'd0;
-		else
-			counter_output1 <= counter_output1 + 1'b1;
-	end
-	
-	always @(posedge clk)
-	begin: counter2
-		if(!resetn)
-			counter_output2 <= 8'd0;
-		else if(counter_output2 == 8'b11111111)
-			counter_output2 <= 8'd0;
-		else if(map_counter_enable == 1'b0)
-			counter_output2 <= 8'd0;
-		else if(counter_output1 == 6'd47)
-			counter_output2 <= counter_output2 + 1'b1;
-		else
-			counter_output2 <= counter_output2;
-	end
-	
-	assign map_finish = &counter_output2;
-	
-	always @(*)
-	begin
-		case(counter_output1)
+		case(counter_output)
 			6'd0: begin
 				xp = 4'd0;
 				yp = 4'd0;
@@ -259,3 +225,4 @@ module draw_map(clk,resetn,map_counter_enable,map_finish,mx,my,mapselect);
 		endcase
 	end
 endmodule
+			

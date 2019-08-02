@@ -20,10 +20,10 @@ module draw_tank(xpos,ypos,clk,resetn,direction,counter_enable,finish,x,y);
 				counter_output <= 6'd0;
 			else if(counter_output == 6'd59)
 				counter_output <= 6'd0;
-			else if(counter_enable == 1'b1)
-				counter_output <= counter_output + 1'b1;
+			else if(counter_enable == 1'b0)
+				counter_output <= 6'd0;
 			else
-				counter_output <= counter_output;
+				counter_output <= counter_output+1'b1;
 		end
 
 	always @(*)
@@ -317,7 +317,7 @@ module draw_tank(xpos,ypos,clk,resetn,direction,counter_enable,finish,x,y);
 					xpd = 4'd4;
 					ypd = 4'd1;
 					xpl = 4'd4;
-					ypl = 4'd5;
+					ypl = 4'd6;
 					xpr = 4'd3;
 					ypr = 4'd4;
 				end
@@ -339,7 +339,7 @@ module draw_tank(xpos,ypos,clk,resetn,direction,counter_enable,finish,x,y);
 					xpl = 4'd4;
 					ypl = 4'd8;
 					xpr = 4'd3;
-					ypr = 4'd5;
+					ypr = 4'd6;
 				end
 			6'd29: begin
 					xpu = 4'd4;
@@ -475,9 +475,9 @@ module draw_tank(xpos,ypos,clk,resetn,direction,counter_enable,finish,x,y);
 					xpu = 4'd7;
 					ypu = 4'd0;
 					xpd = 4'd7;
-					ypd = 4'd6;
-					xpl = 4'd4;
-					ypl = 4'd0;
+					ypd = 4'd0;
+					xpl = 4'd6;
+					ypl = 4'd4;
 					xpr = 4'd5;
 					ypr = 4'd4;
 				end

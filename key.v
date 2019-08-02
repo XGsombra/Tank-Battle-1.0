@@ -1,3 +1,5 @@
+//keyboard module modified from https://www.stepfpga.com/doc/ps2%E9%94%AE%E7%9B%98%E6%A8%A1%E5%9D%97. 
+//This module is initially only capable for at most one key being pressed at a time. We modified it to be capable for multiple keys to adapt our need. Also, we assigned keys to direction and fire signals.
 module Keyboard_PS2
 (
 input					clk_in,			

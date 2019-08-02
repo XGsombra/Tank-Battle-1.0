@@ -1,58 +1,18 @@
-module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x,x1,y,y1,xpos,ypos,moving);
-	input clk,resetn;
+module tank(clk,resetn,initial_xpos,initial_ypos,direction,xpos,ypos,moving,start,moving_direction);
+	input clk,resetn,start;
 	input [7:0] initial_xpos;
 	input [6:0] initial_ypos;
-	input [3:0] initial_x,initial_y;
 	input [2:0] direction;
-	output reg [3:0] x,x1,y,y1;
 	output reg [7:0] xpos;
 	output reg [6:0] ypos;
 	output reg moving;
-	wire [3:0] xu,xd,xl,xr,yu,yd,yl,yr;
+	output reg [2:0] moving_direction;
 	wire finish;
 	reg [3:0] counter_output;
 	reg counter_enable,init;
 	reg [2:0] current_state,next_state;
-	reg [1:0] moving_direction;
 	reg [20:0] dividerout;
 	reg divider;
-	
-	assign xu = x;
-	assign yu = y-1'd1;
-	assign xd = x;
-	assign yd = y+1'd1;
-	assign xl = x-1'd1;
-	assign yl = y;
-	assign xr = x+1'd1;
-	assign yr = y;
-				
-	always @(*)
-		begin:x1_y1
-			if(counter_enable == 1'b0)begin
-				x1 = x;
-				y1 = y;
-				end
-			else begin
-				case(moving_direction)
-					2'd0: begin
-						x1 = xu;
-						y1 = yu;
-						end
-					2'd1: begin
-						x1 = xd;
-						y1 = yd;
-						end
-					2'd2: begin
-						x1 = xl;
-						y1 = yl;
-						end
-					2'd3: begin
-						x1 = xr;
-						y1 = yr;
-						end
-				endcase
-			end
-		end
 		
 	always @(posedge clk)
 		begin:ratedivider
@@ -86,19 +46,19 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 				end
 			else if(divider == 1'd1)begin
 				case(moving_direction)
-					2'd0: begin
+					3'b100: begin
 						xpos <= xpos;
 						ypos <= ypos-1'd1;
 						end
-					2'd1: begin
+					3'b101: begin
 						xpos <= xpos;
 						ypos <= ypos+1'd1;
 						end
-					2'd2: begin
+					3'b110: begin
 						xpos <= xpos-1'd1;
 						ypos <= ypos;
 						end
-					2'd3: begin
+					3'b111: begin
 						xpos <= xpos+1'd1;
 						ypos <= ypos;
 						end
@@ -111,46 +71,12 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 		end
 
 	always @(posedge clk)
-		begin
-			if(!resetn)begin
-				x <= initial_x;
-				y <= initial_y;
-				end
-			else if(init == 1'd1)begin
-				x <= initial_x;
-				y <= initial_y;
-				end
-			else if(finish == 1'd1)begin
-				case(direction[1:0])
-					2'd0: begin
-						x <= x;
-						y <= y-1'd1;
-						end
-					2'd1: begin
-						x <= x;
-						y <= y+1'd1;
-						end
-					2'd2: begin
-						x <= x-1'd1;
-						y <= y;
-						end
-					2'd3: begin
-						x <= x+1'd1;
-						y <= y;
-						end
-				endcase
-			end
-			else begin
-				x <= x;
-				y <= y;
-				end
-		end
-
-	always @(posedge clk)
 		begin: counter
 			if(!resetn)
 				counter_output <= 4'd0;
 			else if(counter_enable == 4'd0)
+				counter_output <= 4'd0;
+			else if(counter_output == 4'b1111)
 				counter_output <= 4'd0;
 			else if(divider == 1'd1)
 				counter_output <= counter_output + 1'b1;
@@ -160,7 +86,9 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 
 	assign finish = (counter_output == 4'd9) ? 1'b1 : 1'b0;
 
-	localparam      INITIAL = 3'd0,
+	localparam      
+					WAIT    = 3'd0,
+					INITIAL = 3'd6,
 					STATIC  = 3'd1,
 					UP      = 3'd2,
 					DOWN    = 3'd3,
@@ -171,6 +99,7 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 		always@(*)
 		begin: state_table 
 				case (current_state)
+					WAIT: next_state = start ? INITIAL : WAIT;
 					INITIAL: next_state = STATIC;
 					STATIC: begin
 								if(direction[2] == 1'd0)
@@ -196,7 +125,7 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 		always@(posedge clk)
 		begin: state_FFs
 			if(!resetn)
-				current_state <= INITIAL;
+				current_state <= WAIT;
 			else
 				current_state <= next_state;
 		end // state_FFS
@@ -206,7 +135,7 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 			counter_enable = 1'b0;
 			init = 1'b0;
 			moving = 1'b0;
-			moving_direction = 2'd0;
+			moving_direction = 3'd0;
 			case (current_state)
 				INITIAL: begin
 					init = 1'b1;
@@ -215,22 +144,22 @@ module tank(clk,resetn,initial_xpos,initial_ypos,initial_x,initial_y,direction,x
 				UP: begin
 					counter_enable = 1'b1;
 					moving = 1'b1;
-					moving_direction = 2'd0;
+					moving_direction = 3'b100;
 					end
 				DOWN: begin
 					counter_enable = 1'b1;
 					moving = 1'b1;
-					moving_direction = 2'd1;
+					moving_direction = 3'b101;
 					end
 				LEFT: begin
 					counter_enable = 1'b1;
 					moving = 1'b1;
-					moving_direction = 2'd2;
+					moving_direction = 3'b110;
 					end
 				RIGHT: begin
 					counter_enable = 1'b1;
 					moving = 1'b1;
-					moving_direction = 2'd3;
+					moving_direction = 3'b111;
 					end
 			endcase
 		end

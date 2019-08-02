@@ -1,3 +1,5 @@
+//VGA Adaptor provided by Professor Brian Harrington.
+
 /* VGA Adapter
  * ----------------
  *
