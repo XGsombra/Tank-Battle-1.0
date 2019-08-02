@@ -1,13 +1,13 @@
 module draw(clk,resetn,start,
-t1y,t2y,t3y,t4y,b1y,b2y,b3y,b4y,
-t1x,t2x,t3x,t4x,b1x,b2x,b3x,b4x,
-t1e,t2e,t3e,t4e,b1e,b2e,b3e,b4e,
+t1y,t2y,t3y,t4y,b1y,b2y,b3y,b4y, // t for tank, b for bullet
+t1x,t2x,t3x,t4x,b1x,b2x,b3x,b4x, // 1, 2, 3, 4 for tank and bullet number
+t1e,t2e,t3e,t4e,b1e,b2e,b3e,b4e, // y, x, e, d for y, x-coordinates, existence and direction
 t1d,t2d,t3d,t4d,b1d,b2d,b3d,b4d,
 x,y,colour,plot,wall_destroyed,erase_wall_finish,
 winner,t1score,t2score,t3score,t4score,
 mapselect);
 	input clk,resetn,start;
-	input [1:0] mapselect;
+	input [1:0] mapselect; // SW[1:0]
 	input [6:0] t1y,t2y,t3y,t4y,b1y,b2y,b3y,b4y;
 	input [7:0] t1x,t2x,t3x,t4x,b1x,b2x,b3x,b4x;
 	input t1e,t2e,t3e,t4e,b1e,b2e,b3e,b4e;
@@ -15,7 +15,7 @@ mapselect);
 	input [1:0] t1d,t2d,t3d,t4d;
 	input [2:0] b1d,b2d,b3d,b4d;
 	input [7:0] wall_destroyed;
-	input [2:0] winner;
+	input [2:0] winner; 
 	input [2:0] t1score,t2score,t3score,t4score;
 	output reg [2:0] colour;
 	output reg [6:0] y;
@@ -38,7 +38,7 @@ mapselect);
 	reg [1:0] direction;
 	reg [1:0] t1dd,t2dd,t3dd,t4dd;
 	reg [2:0] b1dd,b2dd,b3dd,b4dd;
-	reg [4:0] object;
+	reg [4:0] object; // record the oject to draw
 	reg [4:0] current_state, next_state;
 	reg [2:0] bdirection;
 	reg [1:0] tank_num;
@@ -52,7 +52,7 @@ mapselect);
 	menu(clk,erase,bound,menu_enable,winner,menu_finish,menu_plot,menu_x,menu_y);
 	draw_score(clk,score_enable,t1score,t2score,t3score,t4score,tank_num,erase,score_x,score_y,score_plot,score_finish);
 	
-	assign ld_t1 = load_t1 & finish;
+	assign ld_t1 = load_t1 & finish; // signals to update tanks
 	assign ld_t2 = load_t2 & finish;
 	assign ld_t3 = load_t3 & finish;
 	assign ld_t4 = load_t4 & finish;
@@ -142,28 +142,28 @@ mapselect);
 	
 	always @(*)
 	begin
-		case(object[4:2])
-			3'b000: begin
-					x = txo;
+		case(object[4:2]) // in terms of different objects.
+			3'b000: begin // tank
+					x = txo; 
 					y = tyo;
 					end
-			3'b001: begin
+			3'b001: begin // bullet
 					x = bxreal;
 					y = byreal;
 					end
-			3'b010: begin
+			3'b010: begin // map
 					x = mx;
 					y = my;
 					end
-			3'b011: begin
+			3'b011: begin // wall
 					x = wx;
 					y = wy;
 					end
-			3'b100: begin
+			3'b100: begin // the menu
 					x = menu_x;
 					y = menu_y;
 					end
-			3'b110: begin
+			3'b110: begin // the score
 					x = score_x;
 					y = score_y;
 					end
@@ -439,41 +439,41 @@ mapselect);
 			bound = 1'b0;
 			tank_num = 2'd0;
 			case (current_state)
-				ERASE: begin
+				ERASE: begin // Erase
 					menu_enable = 1'b1;
 					object = 5'b10000;
 					colour = 3'd0;
 					erase = 1'b1;
 					end
-				MENU_DRAW: begin
+				MENU_DRAW: begin // Draw the menu
 					menu_enable = 1'b1;
 					object = 5'b10000;
 					colour = 3'b111;
 					end
-				MENU_ERASE: begin
+				MENU_ERASE: begin // Erase the menu
 					menu_enable = 1'b1;
 					object = 5'b10000;
 					colour = 3'd0;
 					erase = 1'b1;
 					end
-				BOUND: begin
+				BOUND: begin // 
 					menu_enable = 1'b1;
 					object = 5'b10000;
 					colour = 3'b111;
 					bound = 1'b1;
 					end
-				MAP: begin
+				MAP: begin // draw the map
 					map_counter_enable = 1'b1;
 					object = 5'd8;
 					colour = 3'b111;
 					end
-				TANK1_ERASE: begin
+				TANK1_ERASE: begin // erase tank 1
 					counter_enable = 1'b1;
 					load_t1 = 1'b1;
 					object = 5'd0;
 					colour = 3'd0;
 					end
-				TANK1_DRAW: begin
+				TANK1_DRAW: begin // draw tank 1 in its new position
 					counter_enable = 1'b1;
 					object = 5'd0;
 					colour = 3'd1;
@@ -511,12 +511,12 @@ mapselect);
 					object = 5'd3;
 					colour = 3'd4;
 					end
-				BU1_ERASE: begin
+				BU1_ERASE: begin // erase bullet
 					load_b1 = 1'b1;
 					object = 5'd4;
 					colour = 3'd0;
 					end
-				BU1_DRAW: begin
+				BU1_DRAW: begin // draw bullet in the new position
 					object = 5'd4;
 					colour = 3'd1;
 					end
@@ -547,14 +547,14 @@ mapselect);
 					object = 5'd7;
 					colour = 3'd4;
 					end
-				T1_SCORE_ERASE: begin
+				T1_SCORE_ERASE: begin // erase the score
 					score_enable = 1'b1;
 					tank_num = 2'd0;
 					erase = 1'b1;
 					object = 5'b11000;
 					colour = 3'd0;
 					end
-				T1_SCORE_DRAW: begin
+				T1_SCORE_DRAW: begin // draw the updated score (can be unchanged)
 					score_enable = 1'b1;
 					tank_num = 2'd0;
 					object = 5'b11000;
@@ -599,7 +599,7 @@ mapselect);
 					object = 5'b11000;
 					colour = 3'd4;
 					end
-				WALL_ERASE: begin
+				WALL_ERASE: begin // erase the walls
 					object = 5'b1100;
 					colour = 3'd0;
 					erase_wall_enable = 1'b1;
