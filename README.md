@@ -7,3 +7,5 @@ Group Members：Quanhong Liu, Xuduo Gu, Letao Chen.
 Video: https://www.youtube.com/watch?v=TlUmPenSSPs&feature=youtu.be
 
 Device: Cyclone IV E, EP4CE115F29C7
+
+Project.v is the top-level module
