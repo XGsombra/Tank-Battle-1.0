@@ -14,7 +14,7 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 	reg divider;
 	
 	localparam      
-					WAIT = 3'd0,
+					WAIT = 3'd0,    // states of the bullet.
 					READY = 3'd1,
 					UP      = 3'd2,
 					DOWN    = 3'd3,
