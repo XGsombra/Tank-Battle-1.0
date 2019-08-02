@@ -13,23 +13,23 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 	reg [19:0] dividerout;
 	reg divider;
 	
-	localparam      
-					WAIT = 3'd0,    // states of the bullet.
-					READY = 3'd1,
-					UP      = 3'd2,
-					DOWN    = 3'd3,
-					LEFT    = 3'd4,
-					RIGHT   = 3'd5;					
+	localparam   // states of the bullet.
+					WAIT = 3'd0,    // the bullet waits 
+					READY = 3'd1,   // the bullet is ready.
+					UP      = 3'd2, // bullet goes up.
+					DOWN    = 3'd3, // bullet goes down.
+					LEFT    = 3'd4, // bullet goes left.
+					RIGHT   = 3'd5;	// bullet goes right.				
 		
 		always@(*)
 		begin: state_table 
 				case (current_state)
 					WAIT: next_state = start ? READY : WAIT;
-					READY: begin
+					READY: begin // the bullet will not be shot unless the fire key is pushed.
 								if(!fire)
 									next_state = READY;
-								else begin
-									case(td)
+								else begin // go to the direction that is indicated by tank direction
+									case(td) // td for tank direction.
 										2'd0: next_state = UP;
 										2'd1: next_state = DOWN;
 										2'd2: next_state = LEFT;
@@ -48,9 +48,9 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 		// current_state registers
 		always@(posedge clk)
 		begin: state_FFs
-			if(!resetn)
+			if(!resetn) // go to WAIT if the game restarts.
 				current_state <= WAIT;
-			else
+			else // otherwise go to the next state.
 				current_state <= next_state;
 		end // state_FFS
 		
@@ -58,7 +58,7 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 		begin: output_logic
 			divider_enable = 1'b0;
 			bd = 3'd0;
-			case (current_state)
+			case (current_state) // bullet direction
 				READY: begin
 					divider_enable = 1'b0;
 					bd = 3'd0;
