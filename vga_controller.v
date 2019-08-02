@@ -1,5 +1,5 @@
 /* This module implements the VGA controller. It assumes a 25MHz clock is supplied as input.
- *
+ * This module is also from professor Brian Harrington.
  * General approach:
  * Go through each line of the screen and read the colour each pixel on that line should have from
  * the Video memory. To do that for each (x,y) pixel on the screen convert (x,y) coordinate to
