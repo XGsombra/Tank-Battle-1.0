@@ -1,13 +1,13 @@
 module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 	input clk,resetn,start;
-	input [7:0] tx;
-	input [6:0] ty;
-	input [1:0] td;
-	input ready;
-	input fire;
-	output reg [7:0] bx;
-	output reg [6:0] by;
-	output reg [2:0] bd;
+	input [7:0] tx; // x-coordinate of tank
+	input [6:0] ty; // y-coordinate of tank
+	input [1:0] td; // direction of tank
+	input ready; // a signal of bullet
+	input fire; // the key of firing
+	output reg [7:0] bx; // x-coordinate of bullet 
+	output reg [6:0] by; // y-coordinate of bullet
+	output reg [2:0] bd; // direction of bullet's movement. bd[2]==0 if no bullet movement.
 	reg [2:0] current_state,next_state;	
 	reg divider_enable;
 	reg [19:0] dividerout;
@@ -58,9 +58,9 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 		begin: output_logic
 			divider_enable = 1'b0;
 			bd = 3'd0;
-			case (current_state) // bullet direction
-				READY: begin
-					divider_enable = 1'b0;
+			case (current_state) // bullet direction (i.e. bd, will be assigned a value according to the state.)
+				READY: begin // ready means no direction of movement.
+					divider_enable = 1'b0; // no movement of bullet.
 					bd = 3'd0;
 					end
 				UP: begin
@@ -104,25 +104,25 @@ module bullet(clk,resetn,tx,ty,td,ready,fire,bx,by,bd,start);
 	
 	always @(posedge clk)
 		begin
-			if(!bd[2])begin
+			if(!bd[2])begin // no direction of movement, just load the coordinate of tank to bullet.
 				bx <= tx;
 				by <= ty;
 				end
 			else if(divider == 1'd1)begin
 				case(bd[1:0])
-					2'd0: begin
+					2'd0: begin // go up, so y--
 						bx <= bx;
 						by <= by-1'd1;
 						end
-					2'd1: begin
+					2'd1: begin // go down, so y++
 						bx <= bx;
 						by <= by+1'd1;
 						end
-					2'd2: begin
+					2'd2: begin // go left, so x--
 						bx <= bx-1'd1;
 						by <= by;
 						end
-					2'd3: begin
+					2'd3: begin // go right, so x++
 						bx <= bx+1'd1;
 						by <= by;
 						end
