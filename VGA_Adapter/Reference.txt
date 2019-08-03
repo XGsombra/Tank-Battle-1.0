@@ -1,0 +1,1 @@
+All files and codes in this folder is the VGA_Adapter module that provided by Professor Brian Harrington.
